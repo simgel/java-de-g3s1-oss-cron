@@ -13,7 +13,7 @@ final class InternalSchedulerEntry {
 
     private Instant lastExecutionTime;
 
-    public InternalSchedulerEntry(CronTrigger trigger, Runnable task, CronTaskScheduler scheduler) {
+    InternalSchedulerEntry(CronTrigger trigger, Runnable task, CronTaskScheduler scheduler) {
         this.trigger = trigger;
         this.task = task;
         this.scheduler = scheduler;
