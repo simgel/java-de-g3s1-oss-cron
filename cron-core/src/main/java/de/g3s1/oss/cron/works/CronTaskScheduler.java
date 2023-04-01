@@ -14,6 +14,8 @@ public final class CronTaskScheduler {
     private final Thread thread;
     private final AtomicBoolean running;
 
+    private final AtomicBoolean waitingForTask;
+
     private final Executor executor;
 
     private final Set<InternalSchedulerEntry> schedulerEntries;
@@ -28,10 +30,12 @@ public final class CronTaskScheduler {
         thread.setDaemon(true);
 
         running = new AtomicBoolean(true);
+        waitingForTask = new AtomicBoolean();
 
         schedulerEntries = new HashSet<>();
         initialWaitMonitor = new Object();
         entrySetMonitor = new Object();
+
     }
 
     public void startThread() {
@@ -56,15 +60,21 @@ public final class CronTaskScheduler {
                     initialWaitMonitor.notifyAll();
                 }
             }
+
+            if(waitingForTask.get()) {
+                // interrupt thread to evaluate timings again
+                thread.interrupt();
+            }
         }
 
         return entry.getEntryWrapper();
     }
 
     private void run() {
-        Instant waitUntil = null;
+        Instant lastJobTime = null;
 
         while (running.get()) {
+            // check if entries is empty
             boolean wait = false;
             synchronized (entrySetMonitor) {
                 wait = schedulerEntries.isEmpty();
@@ -80,12 +90,13 @@ public final class CronTaskScheduler {
                 continue;
             }
 
+            // at least one entry exist
             // perform tasks
-            if(waitUntil == null) {
-                waitUntil = Instant.now();
+            if(lastJobTime == null) {
+                lastJobTime = Instant.now();
             }
 
-            Instant nextJobTime = getNextExecutionTime(waitUntil);
+            Instant nextJobTime = getNextExecutionTime(lastJobTime);
             if(nextJobTime == null) {
                 try {
                     Thread.sleep(200);
@@ -95,20 +106,23 @@ public final class CronTaskScheduler {
                 continue;
             }
 
-
+            // wait for execution
             Duration duration = Duration.between(Instant.now(), nextJobTime);
             try {
+                waitingForTask.set(true);
                 Thread.sleep(Math.max(duration.toMillis(), 0));
             } catch (InterruptedException ignored) {
                 continue;
+            } finally {
+                waitingForTask.set(false);
             }
 
-            waitUntil = nextJobTime;
+            lastJobTime = nextJobTime;
 
             synchronized (entrySetMonitor) {
                 for(InternalSchedulerEntry entry: schedulerEntries) {
-                    if(entry.getTrigger().shouldExecute(waitUntil)) {
-                        entry.getTrigger().wasTriggered(waitUntil);
+                    if(entry.getTrigger().shouldExecute(lastJobTime)) {
+                        entry.getTrigger().wasTriggered(lastJobTime);
                         executor.execute(entry.getTask());
                     }
                 }
