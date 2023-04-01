@@ -5,11 +5,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 
 public class NextSecondTriggerTest extends AbstractTriggerTest {
     @Test
     public void testTrigger() {
-        NextSecondCronTrigger trigger = new NextSecondCronTrigger(zoneOffset);
+        NextSecondCronTrigger trigger = new NextSecondCronTrigger(ZoneOffset.UTC);
 
         Instant baseTime = getBaseTime();
         Instant next = trigger.nextExecution(baseTime);
