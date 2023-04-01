@@ -35,6 +35,12 @@
         <developerConnection>scm:git:ssh://github.com:simgel/java-de-g3s1-oss-cron.git</developerConnection>
     </scm>
 
+    <properties>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
