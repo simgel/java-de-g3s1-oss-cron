@@ -1,5 +1,7 @@
 package de.g3s1.oss.cron.works;
 
+import de.g3s1.oss.cron.api.CronTrigger;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -25,6 +27,10 @@ public final class ChronTaskScheduler {
 
     public void stopThread() {
         running.set(false);
+    }
+
+    public void submit(CronTrigger trigger, Runnable task) {
+        // TODO
     }
 
     private void run() {
