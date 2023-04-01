@@ -9,14 +9,18 @@ final class InternalSchedulerEntry {
     private final CronTrigger trigger;
     private final Runnable task;
 
-    public InternalSchedulerEntry(CronTrigger trigger, Runnable task) {
+    private final CronTaskScheduler scheduler;
+
+    private Instant lastExecutionTime;
+
+    public InternalSchedulerEntry(CronTrigger trigger, Runnable task, CronTaskScheduler scheduler) {
         this.trigger = trigger;
         this.task = task;
+        this.scheduler = scheduler;
     }
 
     CronEntry getEntryWrapper() {
-        //TODO
-        return new CronEntryWrapper();
+        return new CronEntryWrapper(this, scheduler);
     }
 
     CronTrigger getTrigger() {
@@ -27,22 +31,41 @@ final class InternalSchedulerEntry {
         return task;
     }
 
+    Instant getLastExecutionTime() {
+        return lastExecutionTime;
+    }
+
+    void setLastExecutionTime(Instant lastExecutionTime) {
+        this.lastExecutionTime = lastExecutionTime;
+    }
+
     private static final class CronEntryWrapper implements CronEntry {
+        private final InternalSchedulerEntry entry;
+        private final CronTaskScheduler scheduler;
+
+        private CronEntryWrapper(InternalSchedulerEntry entry, CronTaskScheduler scheduler) {
+            this.entry = entry;
+            this.scheduler = scheduler;
+        }
+
         @Override
         public void cancel() {
-            //TODO
+            scheduler.cancel(entry);
         }
 
         @Override
         public Instant lastExecutionTime() {
-            //TODO
-            return null;
+            return entry.getLastExecutionTime();
         }
 
         @Override
         public Instant nextExecutionTime() {
-            //TODO
-            return null;
+            Instant last = entry.getLastExecutionTime();
+            if(last == null) {
+                last = Instant.now();
+            }
+
+            return entry.getTrigger().nextExecution(last);
         }
     }
 }

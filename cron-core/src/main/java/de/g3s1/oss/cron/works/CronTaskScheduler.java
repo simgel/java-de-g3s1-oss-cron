@@ -49,7 +49,7 @@ public final class CronTaskScheduler {
     }
 
     public CronEntry submit(CronTrigger trigger, Runnable task) {
-        InternalSchedulerEntry entry = new InternalSchedulerEntry(trigger, task);
+        InternalSchedulerEntry entry = new InternalSchedulerEntry(trigger, task, this);
 
         synchronized (entrySetMonitor) {
             boolean empty = schedulerEntries.isEmpty();
@@ -123,6 +123,8 @@ public final class CronTaskScheduler {
                 for(InternalSchedulerEntry entry: schedulerEntries) {
                     if(entry.getTrigger().shouldExecute(lastJobTime)) {
                         entry.getTrigger().wasTriggered(lastJobTime);
+                        entry.setLastExecutionTime(lastJobTime);
+
                         executor.execute(entry.getTask());
                     }
                 }
@@ -168,5 +170,13 @@ public final class CronTaskScheduler {
         }
 
         return next;
+    }
+
+    void cancel(InternalSchedulerEntry entry) {
+        synchronized (entrySetMonitor) {
+            if(schedulerEntries.remove(entry)) {
+                thread.interrupt();
+            }
+        }
     }
 }
