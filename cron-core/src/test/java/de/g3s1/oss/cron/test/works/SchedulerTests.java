@@ -17,7 +17,7 @@ public class SchedulerTests {
         scheduler.startThread();
 
         DummyCronTask dummyCronTask = new DummyCronTask();
-        DummyCronTrigger trigger = new DummyCronTrigger();
+        DummyCronTrigger trigger = new DummyCronTrigger(ZoneOffset.UTC);
 
         Instant t1 = Instant.now();
         scheduler.submit(trigger, dummyCronTask);
@@ -38,7 +38,7 @@ public class SchedulerTests {
         scheduler.startThread();
 
         DummyCronTask dummyCronTask = new DummyCronTask();
-        DummyCronTrigger trigger = new DummyCronTrigger();
+        DummyCronTrigger trigger = new DummyCronTrigger(ZoneOffset.UTC);
 
         Instant t1 = Instant.now();
         CronEntry entry = scheduler.submit(trigger, dummyCronTask);

@@ -9,7 +9,7 @@ import java.time.Instant;
 public class NextSecondTriggerTest extends AbstractTriggerTest {
     @Test
     public void testTrigger() {
-        NextSecondCronTrigger trigger = new NextSecondCronTrigger();
+        NextSecondCronTrigger trigger = new NextSecondCronTrigger(zoneOffset);
 
         Instant baseTime = getBaseTime();
         Instant next = trigger.nextExecution(baseTime);

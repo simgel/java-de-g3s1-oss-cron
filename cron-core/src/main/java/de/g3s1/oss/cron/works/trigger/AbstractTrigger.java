@@ -8,10 +8,10 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
 public abstract class AbstractTrigger implements CronTrigger {
-    protected Instant roundToNextSecond(Instant instant) {
-        return LocalDateTime.ofInstant(instant, ZoneOffset.UTC)
+    protected Instant roundToNextSecond(Instant instant, ZoneOffset offset) {
+        return LocalDateTime.ofInstant(instant, offset)
                 .truncatedTo(ChronoUnit.SECONDS)
                 .plusSeconds(1)
-                .toInstant(ZoneOffset.UTC);
+                .toInstant(offset);
     }
 }
