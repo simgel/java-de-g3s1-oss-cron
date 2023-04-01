@@ -11,6 +11,30 @@
 
     <artifactId>cron-core</artifactId>
 
+    <name>Simple cron scheduler</name>
+    <description>Very lightweight cron scheduler without external dependencies</description>
+    <url>https://github.com/simgel/java-de-g3s1-oss-cron</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://github.com/simgel/java-de-g3s1-oss-cron/blob/master/LICENSE</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Simon Gellrich</name>
+            <url>https://github.com/simgel</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/simgel/java-de-g3s1-oss-cron/tree/master</url>
+        <connection>scm:git:git://github.com/simgel/java-de-g3s1-oss-cron.git</connection>
+        <developerConnection>scm:git:ssh://github.com:simgel/java-de-g3s1-oss-cron.git</developerConnection>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
