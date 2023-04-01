@@ -8,6 +8,17 @@
     <artifactId>cron</artifactId>
     <version>0.1-SNAPSHOT</version>
 
+    <name>Simple cron scheduler</name>
+    <description>Very lightweight cron scheduler without external dependencies</description>
+    <url>https://github.com/simgel/java-de-g3s1-oss-cron</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+
     <packaging>pom</packaging>
     <modules>
         <module>cron-core</module>
