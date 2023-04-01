@@ -6,13 +6,13 @@ import de.g3s1.oss.cron.api.CronTrigger;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public final class ChronTaskScheduler {
+public final class CronTaskScheduler {
     private final Thread thread;
     private final AtomicBoolean running;
 
     private final Executor executor;
 
-    public ChronTaskScheduler(Executor executor) {
+    public CronTaskScheduler(Executor executor) {
         this.executor = executor;
 
         thread = new Thread(this::run);
