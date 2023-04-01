@@ -106,6 +106,12 @@ public final class CronTaskScheduler {
                 continue;
             }
 
+            // increase time if a trigger returns a time smaller 1 sec
+            if(Duration.between(lastJobTime, nextJobTime).toMillis() < 1000) {
+                nextJobTime = nextJobTime.plusSeconds(1);
+                System.err.println("Job trigger contract violation");
+            }
+
             // wait for execution
             Duration duration = Duration.between(Instant.now(), nextJobTime);
             try {
