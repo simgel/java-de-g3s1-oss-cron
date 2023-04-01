@@ -17,5 +17,6 @@ public class NextSecondTriggerTest extends AbstractTriggerTest {
 
         long diff = next.toEpochMilli() - baseTime.toEpochMilli();
         Assertions.assertTrue(diff >= 1000);
+        Assertions.assertTrue(diff < 2000);
     }
 }

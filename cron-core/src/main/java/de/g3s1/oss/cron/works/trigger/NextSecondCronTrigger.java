@@ -1,5 +1,6 @@
 package de.g3s1.oss.cron.works.trigger;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 
@@ -16,7 +17,12 @@ public class NextSecondCronTrigger extends AbstractTrigger {
     @Override
     public Instant nextExecution(Instant instant) {
         if(lastTriggerTime == null) {
-            return roundToNextSecond(instant.plusSeconds(1), zoneOffset);
+            Instant next = roundToNextSecond(instant, zoneOffset);
+            if(Duration.between(instant, next).toMillis() < 1000) {
+                return next.plusSeconds(1);
+            }
+
+            return next;
         } else {
             return null;
         }
