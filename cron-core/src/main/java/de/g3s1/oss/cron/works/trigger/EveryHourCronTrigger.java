@@ -5,20 +5,20 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
-/**
- * Triggers every minute at the given second
- */
-public class EveryMinuteCronTrigger extends AbstractTrigger {
-
+public class EveryHourCronTrigger extends AbstractTrigger {
     private final ZoneOffset zoneOffset;
+
+    private final int minute;
 
     private final int second;
 
+
     private Instant lastExecution;
 
-    public EveryMinuteCronTrigger(ZoneOffset zoneOffset, int second) {
+    public EveryHourCronTrigger(ZoneOffset zoneOffset, int minute, int second) {
         this.zoneOffset = zoneOffset;
         this.second = Math.abs(second) % 60;
+        this.minute = Math.abs(minute) % 60;
     }
 
     @Override
@@ -26,11 +26,12 @@ public class EveryMinuteCronTrigger extends AbstractTrigger {
         LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zoneOffset);
 
         LocalDateTime nextExec = localDateTime
-                .truncatedTo(ChronoUnit.MINUTES)
+                .truncatedTo(ChronoUnit.HOURS)
+                .plusMinutes(minute)
                 .plusSeconds(second);
 
         if(!instant.isBefore(nextExec.toInstant(zoneOffset))) {
-            nextExec = nextExec.plusMinutes(1);
+            nextExec = nextExec.plusHours(1);
         }
 
         return nextExec.toInstant(zoneOffset);
@@ -43,6 +44,7 @@ public class EveryMinuteCronTrigger extends AbstractTrigger {
 
     @Override
     public boolean shouldExecute(Instant instant) {
-        return LocalDateTime.ofInstant(instant, zoneOffset).getSecond() == second;
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zoneOffset);
+        return localDateTime.getSecond() == second && localDateTime.getMinute() == minute;
     }
 }

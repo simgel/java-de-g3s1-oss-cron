@@ -1,6 +1,7 @@
 package de.g3s1.oss.cron;
 
 import de.g3s1.oss.cron.api.CronTrigger;
+import de.g3s1.oss.cron.works.trigger.EveryHourCronTrigger;
 import de.g3s1.oss.cron.works.trigger.EveryMinuteCronTrigger;
 import de.g3s1.oss.cron.works.trigger.NextSecondCronTrigger;
 
@@ -32,5 +33,21 @@ public final class Triggers {
 
     public static CronTrigger everyMinute() {
         return everyMinute(ZoneOffset.UTC, 0);
+    }
+
+    public static CronTrigger everyHour(ZoneOffset offset, int minute, int second) {
+        return new EveryHourCronTrigger(offset, minute, second);
+    }
+
+    public static CronTrigger everyHour(int minute, int second) {
+        return everyHour(ZoneOffset.UTC, minute, second);
+    }
+
+    public static CronTrigger everyHour(ZoneOffset offset) {
+        return everyHour(offset, 0, 0);
+    }
+
+    public static CronTrigger everyHour() {
+        return everyHour(ZoneOffset.UTC, 0, 0);
     }
 }
