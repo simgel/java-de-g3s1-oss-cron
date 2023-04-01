@@ -1,12 +1,17 @@
 package de.g3s1.oss.cron.works;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class ChronTaskScheduler {
     private final Thread thread;
     private final AtomicBoolean running;
 
-    public ChronTaskScheduler() {
+    private final Executor executor;
+
+    public ChronTaskScheduler(Executor executor) {
+        this.executor = executor;
+
         thread = new Thread(this::run);
         thread.setDaemon(true);
 
