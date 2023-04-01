@@ -1,5 +1,7 @@
 package de.g3s1.oss.cron;
 
+import de.g3s1.oss.cron.api.CronEntry;
+import de.g3s1.oss.cron.api.CronTrigger;
 import de.g3s1.oss.cron.works.ChronTaskScheduler;
 
 import java.util.concurrent.Executor;
@@ -15,6 +17,10 @@ public final class Cron {
 
     public void stop() {
         this.taskScheduler.stopThread();
+    }
+
+    public CronEntry add(CronTrigger trigger, Runnable task) {
+        return taskScheduler.submit(trigger, task);
     }
 
     public static Cron create(Executor executor) {

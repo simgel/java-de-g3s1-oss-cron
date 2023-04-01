@@ -1,5 +1,6 @@
 package de.g3s1.oss.cron.works;
 
+import de.g3s1.oss.cron.api.CronEntry;
 import de.g3s1.oss.cron.api.CronTrigger;
 
 import java.util.concurrent.Executor;
@@ -29,8 +30,9 @@ public final class ChronTaskScheduler {
         running.set(false);
     }
 
-    public void submit(CronTrigger trigger, Runnable task) {
+    public CronEntry submit(CronTrigger trigger, Runnable task) {
         // TODO
+        return null;
     }
 
     private void run() {
