@@ -3,6 +3,10 @@ package de.g3s1.oss.cron.works;
 import de.g3s1.oss.cron.api.CronEntry;
 import de.g3s1.oss.cron.api.CronTrigger;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -12,6 +16,11 @@ public final class CronTaskScheduler {
 
     private final Executor executor;
 
+    private final Set<InternalSchedulerEntry> schedulerEntries;
+    private final Object initialWaitMonitor;
+
+    private final Object entrySetMonitor;
+
     public CronTaskScheduler(Executor executor) {
         this.executor = executor;
 
@@ -19,6 +28,10 @@ public final class CronTaskScheduler {
         thread.setDaemon(true);
 
         running = new AtomicBoolean(true);
+
+        schedulerEntries = new HashSet<>();
+        initialWaitMonitor = new Object();
+        entrySetMonitor = new Object();
     }
 
     public void startThread() {
@@ -28,17 +41,118 @@ public final class CronTaskScheduler {
 
     public void stopThread() {
         running.set(false);
+        thread.interrupt();
     }
 
     public CronEntry submit(CronTrigger trigger, Runnable task) {
-        // TODO
-        InternalSchedulerEntry entry = new InternalSchedulerEntry();
+        InternalSchedulerEntry entry = new InternalSchedulerEntry(trigger, task);
+
+        synchronized (entrySetMonitor) {
+            boolean empty = schedulerEntries.isEmpty();
+            schedulerEntries.add(entry);
+
+            if(empty) {
+                synchronized (initialWaitMonitor) {
+                    initialWaitMonitor.notifyAll();
+                }
+            }
+        }
+
         return entry.getEntryWrapper();
     }
 
     private void run() {
+        Instant waitUntil = null;
+
         while (running.get()) {
-            // TODO
+            boolean wait = false;
+            synchronized (entrySetMonitor) {
+                wait = schedulerEntries.isEmpty();
+            }
+
+            if(wait) {
+                synchronized (initialWaitMonitor) {
+                    try {
+                        initialWaitMonitor.wait();
+                    } catch (InterruptedException ignored) {
+                    }
+                }
+                continue;
+            }
+
+            // perform tasks
+            if(waitUntil == null) {
+                waitUntil = Instant.now();
+            }
+
+            Instant nextJobTime = getNextExecutionTime(waitUntil);
+            if(nextJobTime == null) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException ignored) {
+                }
+
+                continue;
+            }
+
+
+            Duration duration = Duration.between(Instant.now(), nextJobTime);
+            try {
+                Thread.sleep(Math.max(duration.toMillis(), 0));
+            } catch (InterruptedException ignored) {
+                continue;
+            }
+
+            waitUntil = nextJobTime;
+
+            synchronized (entrySetMonitor) {
+                for(InternalSchedulerEntry entry: schedulerEntries) {
+                    if(entry.getTrigger().shouldExecute(waitUntil)) {
+                        entry.getTrigger().wasTriggered(waitUntil);
+                        executor.execute(entry.getTask());
+                    }
+                }
+            }
         }
+    }
+
+    /**
+     * Get the smallest execution time from all jobs. Removes job with no further trigger times.
+     * @param last Current timestamp
+     * @return next execution time
+     */
+    private Instant getNextExecutionTime(Instant last) {
+        Instant next = null;
+
+        synchronized (entrySetMonitor) {
+            Set<InternalSchedulerEntry> orphaned = null;
+
+            for(InternalSchedulerEntry entry: schedulerEntries) {
+                Instant jobNext = entry.getTrigger().nextExecution(last);
+                if(jobNext == null) {
+                    if(orphaned == null) {
+                        orphaned = new HashSet<>();
+                    }
+
+                    orphaned.add(entry);
+                    continue;
+                }
+
+                if(next == null) {
+                    next = jobNext;
+                    continue;
+                }
+
+                if(jobNext.isBefore(next)) {
+                    next = jobNext;
+                }
+            }
+
+            if(orphaned != null) {
+                schedulerEntries.removeAll(orphaned);
+            }
+        }
+
+        return next;
     }
 }

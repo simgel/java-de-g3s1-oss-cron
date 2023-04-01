@@ -18,4 +18,9 @@ public class NextSecondCronTrigger extends AbstractTrigger {
     public void wasTriggered(Instant instant) {
         lastTriggerTime = instant;
     }
+
+    @Override
+    public boolean shouldExecute(Instant instant) {
+        return lastTriggerTime == null;
+    }
 }

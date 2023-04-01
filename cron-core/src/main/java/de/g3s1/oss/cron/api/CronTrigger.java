@@ -20,4 +20,11 @@ public interface CronTrigger {
      * @param instant Time of execution.
      */
     void wasTriggered(Instant instant);
+
+    /**
+     * Checks if the job should be executed now
+     * @param instant estimated time
+     * @return true if job needs execution
+     */
+    boolean shouldExecute(Instant instant);
 }
