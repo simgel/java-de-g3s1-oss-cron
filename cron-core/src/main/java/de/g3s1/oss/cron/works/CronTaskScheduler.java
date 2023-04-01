@@ -32,7 +32,8 @@ public final class CronTaskScheduler {
 
     public CronEntry submit(CronTrigger trigger, Runnable task) {
         // TODO
-        return null;
+        InternalSchedulerEntry entry = new InternalSchedulerEntry();
+        return entry.getEntryWrapper();
     }
 
     private void run() {
