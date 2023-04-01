@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.concurrent.Executors;
 
 public class SchedulerTests {
@@ -26,5 +28,7 @@ public class SchedulerTests {
 
         Assertions.assertTrue((t2.toEpochMilli() - t1.toEpochMilli()) < 2000);
         Assertions.assertEquals(1, dummyCronTask.getExecutions().size());
+
+        System.out.println(LocalDateTime.ofInstant(dummyCronTask.getExecutions().get(0), ZoneOffset.UTC));
     }
 }

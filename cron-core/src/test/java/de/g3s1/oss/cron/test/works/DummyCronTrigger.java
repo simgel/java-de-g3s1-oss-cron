@@ -15,7 +15,7 @@ public class DummyCronTrigger extends AbstractTrigger {
 
     @Override
     public Instant nextExecution(Instant instant) {
-        return instant.plusSeconds(1);
+        return roundToNextSecond(instant.plusSeconds(1));
     }
 
     @Override

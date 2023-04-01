@@ -8,7 +8,7 @@ public class NextSecondCronTrigger extends AbstractTrigger {
     @Override
     public Instant nextExecution(Instant instant) {
         if(lastTriggerTime == null) {
-            return instant.plusSeconds(1);
+            return roundToNextSecond(instant.plusSeconds(1));
         } else {
             return null;
         }
