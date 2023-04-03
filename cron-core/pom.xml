@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.g3s1.oss.cron</groupId>
         <artifactId>cron</artifactId>
-        <version>0.1.0</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>cron-core</artifactId>

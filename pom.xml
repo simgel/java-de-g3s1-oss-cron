@@ -6,7 +6,7 @@
 
     <groupId>de.g3s1.oss.cron</groupId>
     <artifactId>cron</artifactId>
-    <version>0.1.0</version>
+    <version>0.2-SNAPSHOT</version>
 
     <name>Simple cron scheduler</name>
     <description>Very lightweight cron scheduler without external dependencies</description>

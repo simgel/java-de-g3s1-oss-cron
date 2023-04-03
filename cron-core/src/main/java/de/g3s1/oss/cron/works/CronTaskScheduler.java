@@ -9,8 +9,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class CronTaskScheduler {
+    private static final AtomicInteger THREAD_ID = new AtomicInteger(1);
+
     private final Thread thread;
     private final AtomicBoolean running;
 
@@ -26,7 +29,7 @@ public final class CronTaskScheduler {
     public CronTaskScheduler(Executor executor) {
         this.executor = executor;
 
-        thread = new Thread(this::run);
+        thread = new Thread(this::run, "CronTimer-"+THREAD_ID.getAndIncrement());
         thread.setDaemon(true);
 
         running = new AtomicBoolean(true);
